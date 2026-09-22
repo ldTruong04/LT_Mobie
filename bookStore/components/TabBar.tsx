@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Pressable, Text } from 'react-native';
+import { View, Pressable, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function TabBar({ active, onChange, cartCount, styles, COLORS }: any) {
+const COLORS = { indigo: '#4F46E5', muted: '#6B7280', line: '#E5E7EB', red: '#E85D4A' };
+
+export default function TabBar({ active, onChange, cartCount }: any) {
   const tabs = [
     { key: 'home', label: 'Trang chủ', icon: 'home-outline' },
     { key: 'categories', label: 'Danh mục', icon: 'grid-outline' },
@@ -26,3 +28,30 @@ export default function TabBar({ active, onChange, cartCount, styles, COLORS }: 
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    height: 68,
+    borderTopWidth: 1,
+    borderColor: COLORS.line,
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    paddingBottom: 4,
+  },
+  tab: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3 },
+  tabLabel: { color: COLORS.muted, fontSize: 11, fontWeight: '600' },
+  tabLabelActive: { color: COLORS.indigo },
+  tabCount: {
+    position: 'absolute',
+    zIndex: 1,
+    right: -10,
+    top: -8,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.red,
+  },
+  tabCountText: { color: '#fff', fontSize: 9, fontWeight: '800' },
+});

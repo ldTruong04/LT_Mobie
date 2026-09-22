@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function Header({ title = 'BookStore', showBack, onBack, styles }: any) {
+const COLORS = { navy: '#172554' };
+
+export default function Header({ title = 'BookStore', showBack, onBack }: any) {
   return (
     <View style={styles.header}>
       {showBack ? (
@@ -20,3 +22,18 @@ export default function Header({ title = 'BookStore', showBack, onBack, styles }
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    height: 56,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: COLORS.navy,
+  },
+  logo: { fontSize: 22, fontWeight: '800', color: '#fff' },
+  headerTitle: { flex: 1, marginLeft: 10, color: '#fff', fontSize: 18, fontWeight: '700' },
+  headerButton: { padding: 4 },
+  headerIcons: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+});
