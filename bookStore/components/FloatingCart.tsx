@@ -1,21 +1,27 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../lib/constants';
 
-const COLORS = { indigo: '#4F46E5', red: '#E85D4A', background: '#F8FAFC' };
+type FloatingCartProps = {
+  count: number;
+  onPress: () => void;
+};
 
-export default function FloatingCart({ count, onPress }: any) {
+function FloatingCart({ count, onPress }: FloatingCartProps) {
   return (
     <Pressable style={styles.floatingCart} onPress={onPress}>
       <Ionicons name="cart" size={27} color="#fff" />
-      {count > 0 && (
+      {count > 0 ? (
         <View style={styles.cartBadge}>
-          <Text style={styles.cartBadgeText}>{count}</Text>
+          <Text style={styles.cartBadgeText}>{count > 99 ? '99+' : count}</Text>
         </View>
-      )}
+      ) : null}
     </Pressable>
   );
 }
+
+export default memo(FloatingCart);
 
 const styles = StyleSheet.create({
   floatingCart: {

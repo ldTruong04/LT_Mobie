@@ -1,29 +1,71 @@
-import React from 'react';
-import { View, Pressable, Image, Text, StyleSheet } from 'react-native';
+import React, { memo, useCallback } from 'react';
+import { View, Pressable, Image, Text, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 import Badge from './Badge';
+import { Book, COLORS, money } from '../lib/constants';
 
-const COLORS = { text: '#172033', muted: '#6B7280', red: '#E85D4A' };
+type BookGridProps = {
+  books: Book[];
+  onPress: (book: Book) => void;
+  ListHeaderComponent?: React.ReactElement | null;
+  contentContainerStyle?: object;
+};
 
-export default function BookGrid({ books, onPress, money }: any) {
+const BookCard = memo(function BookCard({
+  book,
+  onPress,
+}: {
+  book: Book;
+  onPress: (book: Book) => void;
+}) {
+  const handlePress = useCallback(() => onPress(book), [book, onPress]);
+
   return (
-    <View style={styles.grid}>
-      {books.map((book: any) => (
-        <Pressable key={book.id} style={styles.bookCard} onPress={() => onPress(book)}>
-          <View style={styles.coverWrap}>
-            <Image source={{ uri: book.image }} style={styles.cover} />
-            {book.discount && <Badge label={book.discount} />}
-          </View>
-          <Text style={styles.bookTitle} numberOfLines={2}>{book.title}</Text>
-          <Text style={styles.bookAuthor} numberOfLines={1}>{book.author}</Text>
-          <Text style={styles.bookPrice}>{money(book.price)}</Text>
-        </Pressable>
-      ))}
-    </View>
+    <Pressable style={styles.bookCard} onPress={handlePress}>
+      <View style={styles.coverWrap}>
+        <Image source={{ uri: book.image }} style={styles.cover} />
+        {book.discount ? <Badge label={book.discount} /> : null}
+      </View>
+      <Text style={styles.bookTitle} numberOfLines={2}>
+        {book.title}
+      </Text>
+      <Text style={styles.bookAuthor} numberOfLines={1}>
+        {book.author}
+      </Text>
+      <Text style={styles.bookPrice}>{money(book.price)}</Text>
+    </Pressable>
+  );
+});
+
+function BookGrid({ books, onPress, ListHeaderComponent, contentContainerStyle }: BookGridProps) {
+  const renderItem: ListRenderItem<Book> = useCallback(
+    ({ item }) => <BookCard book={item} onPress={onPress} />,
+    [onPress],
+  );
+
+  const keyExtractor = useCallback((item: Book) => String(item.id), []);
+
+  return (
+    <FlatList
+      data={books}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      numColumns={2}
+      columnWrapperStyle={styles.row}
+      ListHeaderComponent={ListHeaderComponent}
+      contentContainerStyle={[styles.content, contentContainerStyle]}
+      showsVerticalScrollIndicator={false}
+      initialNumToRender={6}
+      windowSize={5}
+      removeClippedSubviews
+    />
   );
 }
 
+export default memo(BookGrid);
+
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 20 },
+  content: { paddingBottom: 24 },
+  row: { justifyContent: 'space-between', marginBottom: 20 },
   bookCard: { width: '48%' },
   coverWrap: {
     position: 'relative',

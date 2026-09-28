@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../lib/constants';
 
-const COLORS = { navy: '#172554' };
+type HeaderProps = {
+  title?: string;
+  showBack?: boolean;
+  onBack?: () => void;
+  onCartPress?: () => void;
+};
 
-export default function Header({ title = 'BookStore', showBack, onBack }: any) {
+function Header({ title = 'BookStore', showBack, onBack, onCartPress }: HeaderProps) {
   return (
     <View style={styles.header}>
       {showBack ? (
-        <Pressable style={styles.headerButton} onPress={onBack}>
+        <Pressable style={styles.headerButton} onPress={onBack} hitSlop={8}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </Pressable>
       ) : (
@@ -17,11 +23,15 @@ export default function Header({ title = 'BookStore', showBack, onBack }: any) {
       {showBack && <Text style={styles.headerTitle}>{title}</Text>}
       <View style={styles.headerIcons}>
         {!showBack && <Ionicons name="search-outline" size={25} color="#fff" />}
-        <Ionicons name="cart-outline" size={26} color="#fff" />
+        <Pressable onPress={onCartPress} hitSlop={8} disabled={!onCartPress}>
+          <Ionicons name="cart-outline" size={26} color="#fff" />
+        </Pressable>
       </View>
     </View>
   );
 }
+
+export default memo(Header);
 
 const styles = StyleSheet.create({
   header: {

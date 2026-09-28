@@ -1,26 +1,42 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { View, Image, Text, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Book, COLORS, money } from '../lib/constants';
 
-const COLORS = { line: '#E5E7EB', muted: '#6B7280', red: '#E85D4A', text: '#172033', pale: '#EEF2FF', navy: '#172554' };
+type CartItemProps = {
+  book: Book;
+  quantity: number;
+  onChange: (id: number, delta: number) => void;
+};
 
-export default function CartItem({ book, quantity, onChange, money }: any) {
+function CartItem({ book, quantity, onChange }: CartItemProps) {
+  const decrease = useCallback(() => onChange(book.id, -1), [book.id, onChange]);
+  const increase = useCallback(() => onChange(book.id, 1), [book.id, onChange]);
+
   return (
     <View style={styles.cartItem}>
       <Image source={{ uri: book.image }} style={styles.cartImage} />
       <View style={styles.cartInfo}>
-        <Text style={styles.cartTitle} numberOfLines={2}>{book.title}</Text>
+        <Text style={styles.cartTitle} numberOfLines={2}>
+          {book.title}
+        </Text>
         <Text style={styles.cartAuthor}>{book.author}</Text>
         <Text style={styles.cartPrice}>{money(book.price)}</Text>
       </View>
       <View style={styles.quantityBox}>
-        <Pressable onPress={() => onChange(book.id, -1)} style={styles.quantityButton}><Ionicons name="remove" size={16} color={COLORS.navy} /></Pressable>
+        <Pressable onPress={decrease} style={styles.quantityButton} hitSlop={6}>
+          <Ionicons name="remove" size={16} color={COLORS.navy} />
+        </Pressable>
         <Text style={styles.quantity}>{quantity}</Text>
-        <Pressable onPress={() => onChange(book.id, 1)} style={styles.quantityButton}><Ionicons name="add" size={16} color={COLORS.navy} /></Pressable>
+        <Pressable onPress={increase} style={styles.quantityButton} hitSlop={6}>
+          <Ionicons name="add" size={16} color={COLORS.navy} />
+        </Pressable>
       </View>
     </View>
   );
 }
+
+export default memo(CartItem);
 
 const styles = StyleSheet.create({
   cartItem: {

@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { COLORS } from '../lib/constants';
 
-const COLORS = { red: '#E85D4A' };
+type BadgeProps = {
+  label: string;
+};
 
-export default function Badge({ label }: any) {
+function Badge({ label }: BadgeProps) {
   return (
     <View style={styles.badge}>
       <Text style={styles.badgeText}>{label}</Text>
     </View>
   );
 }
+
+export default memo(Badge);
 
 const styles = StyleSheet.create({
   badge: {

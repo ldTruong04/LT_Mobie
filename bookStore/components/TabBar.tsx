@@ -1,33 +1,70 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { View, Pressable, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { COLORS } from '../lib/constants';
+import { useCart } from '../hooks/useCart';
 
-const COLORS = { indigo: '#4F46E5', muted: '#6B7280', line: '#E5E7EB', red: '#E85D4A' };
+const TAB_META = {
+  HomeTab: { label: 'Trang chủ', icon: 'home-outline' },
+  CategoriesTab: { label: 'Danh mục', icon: 'grid-outline' },
+  CartTab: { label: 'Giỏ hàng', icon: 'cart-outline' },
+  AccountTab: { label: 'Tài khoản', icon: 'person-outline' },
+} as const;
 
-export default function TabBar({ active, onChange, cartCount }: any) {
-  const tabs = [
-    { key: 'home', label: 'Trang chủ', icon: 'home-outline' },
-    { key: 'categories', label: 'Danh mục', icon: 'grid-outline' },
-    { key: 'cart', label: 'Giỏ hàng', icon: 'cart-outline' },
-    { key: 'account', label: 'Tài khoản', icon: 'person-outline' },
-  ];
+function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+  const { totalQuantity } = useCart();
+  const badgeLabel = useMemo(() => (totalQuantity > 99 ? '99+' : String(totalQuantity)), [totalQuantity]);
+
   return (
     <View style={styles.tabBar}>
-      {tabs.map((tab: any) => {
-        const isActive = active === tab.key;
+      {state.routes.map((route, index) => {
+        const isActive = state.index === index;
+        const options = descriptors[route.key].options;
+        const meta = TAB_META[route.name as keyof typeof TAB_META];
+        const label =
+          typeof options.tabBarLabel === 'string'
+            ? options.tabBarLabel
+            : typeof options.title === 'string'
+              ? options.title
+              : meta.label;
+        const badge = route.name === 'CartTab' && totalQuantity > 0 ? badgeLabel : null;
+
+        const handlePress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          if (!isActive && !event.defaultPrevented) {
+            navigation.navigate(route.name as never);
+          }
+        };
+
         return (
-          <Pressable key={tab.key} style={styles.tab} onPress={() => onChange(tab.key)}>
+          <Pressable key={route.key} style={styles.tab} onPress={handlePress}>
             <View>
-              {tab.key === 'cart' && cartCount > 0 && <View style={styles.tabCount}><Text style={styles.tabCountText}>{cartCount}</Text></View>}
-              <Ionicons name={tab.icon as any} size={23} color={isActive ? COLORS.indigo : COLORS.muted} />
+              {badge ? (
+                <View style={styles.tabCount}>
+                  <Text style={styles.tabCountText}>{badge}</Text>
+                </View>
+              ) : null}
+              <Ionicons
+                name={meta.icon as keyof typeof Ionicons.glyphMap}
+                size={23}
+                color={isActive ? COLORS.indigo : COLORS.muted}
+              />
             </View>
-            <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>{tab.label}</Text>
+            <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>{label}</Text>
           </Pressable>
         );
       })}
     </View>
   );
 }
+
+export default memo(TabBar);
 
 const styles = StyleSheet.create({
   tabBar: {

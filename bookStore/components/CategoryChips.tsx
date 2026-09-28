@@ -1,23 +1,50 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { View, Pressable, Text, StyleSheet } from 'react-native';
+import { COLORS } from '../lib/constants';
 
-const COLORS = { indigo: '#4F46E5' };
+type CategoryChipsProps = {
+  categories: readonly string[];
+  selected: string;
+  onSelect: (category: string) => void;
+};
 
-export default function CategoryChips({ categories, selected, onSelect }: any) {
+function CategoryChips({ categories, selected, onSelect }: CategoryChipsProps) {
   return (
     <View style={styles.chips}>
-      {categories.map((category: string) => (
-        <Pressable
+      {categories.map((category) => (
+        <Chip
           key={category}
-          onPress={() => onSelect(category)}
-          style={[styles.chip, selected === category && styles.chipSelected]}
-        >
-          <Text style={[styles.chipText, selected === category && styles.chipTextSelected]}>{category}</Text>
-        </Pressable>
+          category={category}
+          selected={selected === category}
+          onSelect={onSelect}
+        />
       ))}
     </View>
   );
 }
+
+const Chip = memo(function Chip({
+  category,
+  selected,
+  onSelect,
+}: {
+  category: string;
+  selected: boolean;
+  onSelect: (category: string) => void;
+}) {
+  const handlePress = useCallback(() => onSelect(category), [category, onSelect]);
+
+  return (
+    <Pressable
+      onPress={handlePress}
+      style={[styles.chip, selected && styles.chipSelected]}
+    >
+      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{category}</Text>
+    </Pressable>
+  );
+});
+
+export default memo(CategoryChips);
 
 const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
