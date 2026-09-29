@@ -1,34 +1,56 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
-  Image,
+  RefreshControl,
   SafeAreaView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from 'react-native';
+import MovieCard, { Movie } from './components/MovieCard';
 
 const API_URL = 'https://68d3ef62214be68f8c67c74c.mockapi.io/movie';
-
-type Movie = {
-  id: string;
-  title: string;
-  rating: number;
-  poster: string;
-  isShowing: boolean;
-};
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isTile, setIsTile] = useState(false);
+
+  const numColumns = isTile ? 2 : 1;
+  const layout = isTile ? 'tile' : 'row';
+
+  const fetchMovies = useCallback(async () => {
+    const response = await fetch(API_URL);
+    const data: Movie[] = await response.json();
+    setMovies(data);
+  }, []);
 
   useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((data: Movie[]) => setMovies(data))
-      .finally(() => setLoading(false));
-  }, []);
+    fetchMovies().finally(() => setLoading(false));
+  }, [fetchMovies]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchMovies();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchMovies]);
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      const movie = movies.find((item) => item.id === id);
+      if (movie) {
+        Alert.alert(movie.title);
+      }
+    },
+    [movies],
+  );
 
   if (loading) {
     return (
@@ -40,19 +62,24 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.heading}>Danh sách phim</Text>
+      <View style={styles.header}>
+        <Text style={styles.heading}>Movie App</Text>
+        <View style={styles.switchRow}>
+          <Switch value={isTile} onValueChange={setIsTile} />
+        </View>
+      </View>
+
       <FlatList
+        key={String(numColumns)}
         data={movies}
         keyExtractor={(item) => item.id}
+        numColumns={numColumns}
+        columnWrapperStyle={isTile ? styles.columnWrapper : undefined}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Image source={{ uri: item.poster }} style={styles.poster} />
-            <View style={styles.info}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text>Rating: {item.rating}</Text>
-              <Text>{item.isShowing ? 'Đang chiếu' : 'Ngừng chiếu'}</Text>
-            </View>
-          </View>
+          <MovieCard movie={item} layout={layout} onSelect={handleSelect} />
         )}
       />
     </SafeAreaView>
@@ -62,14 +89,17 @@ export default function App() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 12 },
-  item: {
+  header: { marginBottom: 12 },
+  heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 8 },
+  switchRow: {
     flexDirection: 'row',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  poster: { width: 70, height: 100, backgroundColor: '#eee', marginRight: 12 },
-  info: { flex: 1, justifyContent: 'center' },
-  title: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
+  switchLabel: { fontSize: 16 },
+  columnWrapper: {
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    gap: 10,
+  },
 });
