@@ -64,7 +64,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.heading}>Movie App</Text>
-        <View style={styles.switchRow}>
+        <View style={styles.chuyenDoi}>
           <Switch value={isTile} onValueChange={setIsTile} />
         </View>
       </View>
@@ -91,12 +91,12 @@ const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: { marginBottom: 12 },
   heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 8 },
-  switchRow: {
+  chuyenDoi: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  switchLabel: { fontSize: 16 },
+ 
   columnWrapper: {
     justifyContent: 'space-between',
     marginBottom: 10,

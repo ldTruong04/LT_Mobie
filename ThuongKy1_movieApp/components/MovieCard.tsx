@@ -1,12 +1,5 @@
 import React, { memo } from 'react';
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Dimensions,Image, StyleSheet,Text,TouchableOpacity,View,} from 'react-native';
 
 export type Movie = {
   id: string;
@@ -77,19 +70,16 @@ const styles = StyleSheet.create({
     width: TILE_WIDTH,
     height: 280,
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 8,
   },
   posterRow: {
     width: 70,
     height: 100,
-    backgroundColor: '#eee',
     marginRight: 12,
   },
   posterTile: {
     width: '100%',
     height: 120,
-    backgroundColor: '#eee',
     marginBottom: 8,
     borderRadius: 4,
   },
