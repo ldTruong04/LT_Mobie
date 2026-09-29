@@ -31,7 +31,6 @@ export default function App() {
             {seatNumbers.map((number) => {
               const seatId = `${row}${number}`;
               const isSelected = selectedSeats.includes(seatId);
-
               return (
                 <Pressable key={seatId} onPress={() => toggleSeat(seatId)} style={({ pressed }) => [styles.seat, isSelected && styles.seatSelected]}>
                   <Text>{seatId}</Text>
@@ -54,7 +53,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    
     paddingTop: 64,
     paddingHorizontal: 16,
   },
